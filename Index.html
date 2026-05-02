@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ContractForge v2.7</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#C49A28">
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+<style>
+:root {
+  --navy:#1F3864;--steel:#2E5F8A;--sky:#4A90C4;--light:#D9E2F3;
+  --pale:#F0F4FB;--gold:#C49A28;--white:#FFFFFF;--ink:#1A2233;
+  --muted:#6B7A96;--border:#C8D4E8;--green:#2D7D52;--red:#C0392B;--bg:#F5F7FB;
+}
+body.dark{--navy:#0f1e35;--steel:#4A90C4;--sky:#6aaee0;--light:#1a2d45;--pale:#131f30;--gold:#d4a93a;--white:#1a2738;--ink:#e8edf5;--muted:#7a9ab8;--border:#253548;--green:#3a9e6a;--red:#d9534f;--bg:#0d1a28;}
+body.dark .app-header{background:#080f1a;}
+body.dark .form-input{background:var(--pale);color:var(--ink);}
+body.dark select.form-input{background:var(--pale);}
+body.dark .wiz-card{background:var(--white);}
+body.dark .mat-row:nth-child(even){background:var(--pale);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;transition:background .2s,color .2s;}
+
+/* HEADER */
+.app-header{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 16px rgba(31,56,100,.25);}
+.header-inner{max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.header-brand{display:flex;align-items:center;gap:10px;}
+.header-icon{width:36px;height:36px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.logo-img{width:36px;height:36px;border-radius:8px;object-fit:cover;}
+.header-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;}
+.header-sub{font-size:10px;color:#7A9CC8;margin-top:1px;}
+.version-badge{font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.45);background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);padding:3px 7px;border-radius:10px;white-space:nowrap;}
+.header-actions{display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;border-radius:8px;font-size:12px;font-family:'Source Sans 3',sans-serif;font-weight:600;cursor:pointer;border:none;transition:all .15s;white-space:nowrap;}
+.btn-gold{background:var(--gold);color:#fff;}.btn-gold:hover{background:#b8891f;}
+.btn-outline{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.2);color:#fff;}.btn-outline:hover{background:rgba(255,255,255,.18);}
+.btn-green{background:var(--green);color:#fff;}.btn-green:hover{background:#256644;}
+.btn-red{background:var(--red);color:#fff;}.btn-red:hover{background:#a93226;}
+.btn-navy{background:var(--navy);color:#fff;border:1px solid var(--border);}.btn-navy:hover{background:var(--steel);}
+.btn-lg{padding:14px 24px;font-size:15px;border-radius:12px;}
+.btn-full{width:100%;justify-content:center;}
+
+/* MODE BAR */
+.mode-bar{background:var(--steel);padding:8px 16px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;position:fixed;bottom:0;left:0;right:0;z-index:300;box-shadow:0 -3px 16px rgba(0,0,0,.25);}
+.mode-label{font-size:11px;color:rgba(255,255,255,.7);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;}
+.mode-action-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:none;border-radius:8px;font-size:12px;font-family:'Source Sans 3',sans-serif;font-weight:700;cursor:pointer;transition:all .15s;color:#fff;}
+.mode-action-btn.quote-btn{background:var(--gold);}.mode-action-btn.quote-btn:hover{background:#b8891f;}
+.mode-action-btn.contract-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);}.mode-action-btn.contract-btn:hover{background:rgba(255,255,255,.28);}
+.mode-action-btn.receipt-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);}.mode-action-btn.receipt-btn:hover{background:rgba(255,255,255,.28);}
+
+/* PREVIEW MODAL */
+.preview-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-start;justify-content:center;padding:0;overflow-y:auto;}
+.preview-modal-overlay.open{display:flex;}
+.preview-modal-box{background:var(--bg);width:100%;max-width:860px;min-height:100vh;display:flex;flex-direction:column;}
+.preview-modal-bar{background:var(--navy);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:10;flex-wrap:wrap;}
+.preview-modal-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:#fff;display:flex;align-items:center;gap:8px;}
+.preview-modal-actions{display:flex;gap:8px;align-items:center;}
+.preview-modal-content{padding:20px;flex:1;}
+
+/* LAYOUT */
+.main-wrap{max-width:1200px;margin:0 auto;padding:18px 14px 76px;display:grid;grid-template-columns:210px 1fr;gap:16px;}
+@media(max-width:750px){.main-wrap{grid-template-columns:1fr;}.sidebar{display:none;}}
+
+/* SIDEBAR */
+.sidebar{position:sticky;top:95px;height:fit-content;background:var(--white);border-radius:12px;border:1px solid var(--border);overflow:hidden;box-shadow:0 2px 12px rgba(31,56,100,.07);}
+.sidebar-label{padding:9px 13px 6px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:9px 13px;cursor:pointer;border-left:3px solid transparent;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border);transition:all .15s;user-select:none;}
+.nav-item:hover{background:var(--pale);color:var(--steel);}
+.nav-item.active{background:var(--pale);color:var(--navy);border-left-color:var(--gold);font-weight:600;}
+.nav-num{width:18px;height:18px;background:var(--light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'DM Mono',monospace;color:var(--steel);flex-shrink:0;}
+.nav-item.active .nav-num{background:var(--navy);color:#fff;}
+.nav-wiz{background:linear-gradient(135deg,var(--gold),#e8b84b)!important;color:#fff!important;border-left-color:transparent!important;}
+.nav-wiz .nav-num{background:rgba(255,255,255,.25)!important;color:#fff!important;}
+
+/* CARDS */
+.section-card{background:var(--white);border-radius:12px;border:1px solid var(--border);overflow:hidden;box-shadow:0 2px 12px rgba(31,56,100,.06);margin-bottom:16px;scroll-margin-top:105px;}
+.section-head{background:var(--navy);padding:11px 18px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;}
+.section-head:hover{background:var(--steel);}
+.section-head-num{width:24px;height:24px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:11px;color:#fff;flex-shrink:0;}
+.section-head-title{font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:#fff;flex:1;}
+.section-head-badge{font-size:10px;background:var(--gold);color:#fff;padding:2px 7px;border-radius:7px;font-family:'DM Mono',monospace;flex-shrink:0;}
+.section-chevron{font-size:13px;color:rgba(255,255,255,.55);transition:transform .22s;flex-shrink:0;margin-left:6px;}
+.section-card.collapsed .section-body,.section-card.collapsed .wiz-wrap{display:none;}
+.section-card.collapsed .section-chevron{transform:rotate(-90deg);}
+.section-body{padding:16px 18px;}
+/* Material display toggle in preview modal */
+.mat-toggle-group{display:inline-flex;border:1px solid rgba(255,255,255,.3);border-radius:7px;overflow:hidden;}
+.mat-toggle-btn{background:rgba(255,255,255,.08);border:none;border-right:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);font-size:11px;font-family:'Source Sans 3',sans-serif;font-weight:600;padding:5px 11px;cursor:pointer;transition:all .15s;}
+.mat-toggle-btn:last-child{border-right:none;}
+.mat-toggle-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.mat-toggle-btn.active{background:var(--gold);color:#fff;}
+
+/* FORMS */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px;}
+.form-row.three{grid-template-columns:1fr 1fr 1fr;}
+.form-row.single{grid-template-columns:1fr;}
+@media(max-width:600px){.form-row,.form-row.three{grid-template-columns:1fr;}}
+.form-group{display:flex;flex-direction:column;gap:4px;}
+.form-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-family:'DM Mono',monospace;}
+.form-input{padding:9px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'Source Sans 3',sans-serif;color:var(--ink);background:var(--white);transition:border-color .15s;}
+.form-input:focus{outline:none;border-color:var(--steel);}
+.form-input.mono{font-family:'DM Mono',monospace;}
+.hint{font-size:11px;color:var(--muted);font-style:italic;margin-top:3px;}
+.section-divider{height:1px;background:var(--border);margin:13px 0;}
+
+/* SCOPE */
+.scope-category{margin-bottom:14px;}
+.scope-cat-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--steel);font-family:'DM Mono',monospace;margin-bottom:7px;display:flex;align-items:center;gap:8px;}
+.scope-cat-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.scope-item-row{display:grid;grid-template-columns:auto 1fr auto auto auto auto;gap:7px;align-items:center;background:var(--pale);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:5px;}
+.scope-item-check{width:18px;height:18px;cursor:pointer;accent-color:var(--navy);}
+.scope-item-name{font-size:13px;color:var(--ink);}
+.scope-item-qty{width:58px;padding:5px 7px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:'DM Mono',monospace;text-align:center;background:var(--white);color:var(--ink);}
+.scope-item-unit{font-size:11px;color:var(--muted);white-space:nowrap;}
+.scope-item-price{width:88px;padding:5px 7px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:'DM Mono',monospace;text-align:right;background:var(--white);color:var(--ink);}
+.scope-item-total{font-size:12px;font-family:'DM Mono',monospace;color:var(--steel);min-width:68px;text-align:right;}
+.remove-btn{width:24px;height:24px;border:none;background:rgba(192,57,43,.1);color:var(--red);border-radius:5px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.remove-btn:hover{background:rgba(192,57,43,.22);}
+.add-item-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;background:var(--pale);border:1.5px dashed var(--border);border-radius:8px;font-size:12px;color:var(--steel);cursor:pointer;font-family:'Source Sans 3',sans-serif;font-weight:600;transition:all .15s;margin-top:5px;}
+.add-item-btn:hover{background:var(--light);border-color:var(--steel);}
+
+/* RATES */
+.rate-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:9px;}
+.rate-card{background:var(--pale);border:1px solid var(--border);border-radius:8px;padding:9px 11px;}
+.rate-card-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:4px;}
+.rate-card-input{width:100%;padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-family:'DM Mono',monospace;color:var(--ink);background:var(--white);text-align:right;}
+.rate-card-input:focus{outline:none;border-color:var(--steel);}
+
+/* CLIENTS */
+.client-row{background:var(--pale);border:1px solid var(--border);border-radius:8px;padding:11px 13px;margin-bottom:7px;}
+.client-row-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.client-tag{font-family:'DM Mono',monospace;font-size:10px;font-weight:600;background:var(--navy);color:#fff;padding:2px 7px;border-radius:7px;}
+.client-fields{display:grid;grid-template-columns:1fr 1fr 100px;gap:9px;}
+@media(max-width:600px){.client-fields{grid-template-columns:1fr;}}
+
+/* STAGES */
+.stage-row{display:grid;grid-template-columns:1fr 100px 110px 36px 36px;gap:7px;align-items:end;background:var(--pale);border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin-bottom:6px;}
+@media(max-width:600px){.stage-row{grid-template-columns:1fr 1fr;}}
+
+/* TOTAL BAR */
+.total-bar{background:var(--navy);color:#fff;border-radius:10px;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px;margin-bottom:14px;}
+.total-item{display:flex;flex-direction:column;gap:2px;}
+.total-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#7A9CC8;font-family:'DM Mono',monospace;}
+.total-val{font-family:'DM Mono',monospace;font-size:16px;font-weight:500;color:var(--gold);}
+
+/* PREVIEW */
+.preview-wrap{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:22px;}
+.pv-header{text-align:center;border-bottom:2.5px solid var(--navy);padding-bottom:13px;margin-bottom:14px;}
+.pv-logo{max-height:55px;max-width:180px;object-fit:contain;display:block;margin:0 auto 7px;}
+.pv-company{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--navy);}
+.pv-company-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.pv-doc-title{font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:var(--navy);margin-top:9px;text-transform:uppercase;letter-spacing:.06em;}
+.pv-section-title{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--navy);border-bottom:1px solid var(--border);padding-bottom:3px;margin:13px 0 7px;}
+.pv-scope-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:9px;}
+.pv-scope-table th{background:var(--navy);color:#fff;padding:5px 7px;font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;text-align:left;}
+.pv-scope-table td{padding:5px 7px;border-bottom:1px solid var(--border);}
+.pv-scope-table tr:nth-child(even) td{background:var(--pale);}
+.pv-scope-table .tr-total td{font-weight:700;background:#e8e8e8;}
+.pv-payment-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:9px;}
+.pv-payment-table th{background:var(--steel);color:#fff;padding:5px 7px;font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;}
+.pv-payment-table td{padding:5px 7px;border-bottom:1px solid var(--border);text-align:center;}
+.pv-sig-block{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.pv-sig{border-top:1px solid var(--ink);padding-top:5px;font-size:11px;color:var(--muted);}
+.receipt-block{border:1px solid var(--border);border-radius:8px;padding:11px 13px;margin-bottom:9px;}
+.receipt-block-title{font-family:'Playfair Display',serif;font-size:12px;font-weight:600;color:var(--navy);margin-bottom:6px;border-bottom:1px solid var(--light);padding-bottom:4px;}
+.receipt-field{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;}
+.receipt-field .lbl{color:var(--muted);font-weight:600;}
+.receipt-sig{margin-top:7px;padding-top:6px;border-top:1px dashed var(--border);font-size:11px;color:var(--muted);}
+.note-text{font-size:10px;color:var(--muted);font-style:italic;margin-top:3px;}
+
+/* TABS */
+.tab-bar{display:flex;gap:3px;background:var(--pale);border-radius:10px;padding:3px;margin-bottom:14px;}
+.tab{flex:1;padding:7px 9px;border:none;background:transparent;border-radius:7px;font-size:12px;font-family:'Source Sans 3',sans-serif;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;text-align:center;}
+.tab.active{background:var(--navy);color:#fff;}
+
+/* ═══════════════════════════════════════════════
+   QUOTE WIZARD
+═══════════════════════════════════════════════ */
+.wiz-wrap{padding:16px 18px;}
+.wiz-progress-bar{height:6px;background:var(--light);border-radius:3px;overflow:hidden;margin-bottom:20px;}
+.wiz-progress-fill{height:100%;background:linear-gradient(90deg,var(--steel),var(--gold));border-radius:3px;transition:width .4s ease;}
+.wiz-step-label{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:16px;display:flex;justify-content:space-between;}
+.wiz-card{background:var(--pale);border:1px solid var(--border);border-radius:14px;padding:22px 20px;margin-bottom:16px;}
+.wiz-question{font-family:'Playfair Display',serif;font-size:19px;font-weight:600;color:var(--navy);margin-bottom:6px;line-height:1.3;}
+.wiz-sub{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.5;}
+.wiz-options{display:grid;gap:10px;}
+.wiz-option{padding:14px 18px;background:var(--white);border:2px solid var(--border);border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px;color:var(--ink);}
+.wiz-option:hover{border-color:var(--steel);background:var(--light);}
+.wiz-option.selected{border-color:var(--navy);background:var(--light);color:var(--navy);}
+.wiz-option-icon{font-size:20px;flex-shrink:0;}
+.wiz-input-wrap{margin-top:6px;}
+.wiz-big-input{width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:10px;font-size:18px;font-family:'DM Mono',monospace;color:var(--ink);background:var(--white);text-align:center;transition:border-color .15s;}
+.wiz-big-input:focus{outline:none;border-color:var(--steel);}
+.wiz-input-unit{text-align:center;font-size:12px;color:var(--muted);margin-top:6px;font-family:'DM Mono',monospace;}
+.wiz-nav{display:flex;gap:10px;margin-top:6px;}
+.wiz-nav .btn{flex:1;justify-content:center;padding:12px;font-size:14px;}
+.wiz-stepper{display:flex;align-items:center;gap:12px;margin-top:8px;justify-content:center;}
+.wiz-stepper-btn{width:44px;height:44px;border:2px solid var(--border);border-radius:10px;background:var(--white);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;transition:all .15s;color:var(--ink);}
+.wiz-stepper-btn:hover{border-color:var(--steel);background:var(--light);}
+.wiz-stepper-val{font-family:'DM Mono',monospace;font-size:24px;font-weight:700;color:var(--navy);min-width:60px;text-align:center;}
+.wiz-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--white);border:2px solid var(--border);border-radius:10px;margin-bottom:8px;}
+.wiz-toggle-label{font-size:14px;font-weight:600;color:var(--ink);}
+.wiz-toggle{position:relative;width:48px;height:26px;}
+.wiz-toggle input{opacity:0;width:0;height:0;}
+.wiz-toggle-slider{position:absolute;inset:0;background:#ccc;border-radius:13px;transition:.3s;cursor:pointer;}
+.wiz-toggle-slider:before{content:'';position:absolute;width:20px;height:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s;}
+.wiz-toggle input:checked+.wiz-toggle-slider{background:var(--navy);}
+.wiz-toggle input:checked+.wiz-toggle-slider:before{transform:translateX(22px);}
+
+/* MATERIAL LIST */
+.mat-table{width:100%;border-collapse:collapse;font-size:13px;}
+.mat-table th{background:var(--navy);color:#fff;padding:8px 10px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;}
+.mat-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.mat-table tr:nth-child(even) td{background:var(--pale);}
+.mat-table .mat-total-row td{font-weight:700;background:var(--light);}
+.mat-price-input{width:90px;padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-family:'DM Mono',monospace;text-align:right;background:var(--white);color:var(--ink);}
+.mat-price-input:focus{outline:none;border-color:var(--steel);}
+.matcfg-name-input{flex:1;padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-family:'Source Sans 3',sans-serif;background:var(--white);color:var(--ink);}
+.matcfg-unit-input{width:70px;padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-family:'DM Mono',monospace;background:var(--white);color:var(--ink);}
+.matcfg-name-input:focus,.matcfg-unit-input:focus{outline:none;border-color:var(--steel);}
+body.dark .matcfg-name-input,body.dark .matcfg-unit-input{background:var(--pale);color:var(--ink);}
+.mat-line-total{font-family:'DM Mono',monospace;font-size:12px;color:var(--steel);white-space:nowrap;}
+
+/* QUOTE RESULT */
+.quote-result{background:var(--navy);color:#fff;border-radius:12px;padding:18px 20px;margin-bottom:14px;}
+.quote-result-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:12px;color:var(--gold);}
+.quote-range{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.quote-range-item{background:rgba(255,255,255,.08);border-radius:10px;padding:12px 14px;text-align:center;}
+.quote-range-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#7A9CC8;font-family:'DM Mono',monospace;margin-bottom:4px;}
+.quote-range-val{font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:#fff;}
+.quote-range-item.mid{background:rgba(196,154,40,.25);border:1px solid var(--gold);}
+.quote-range-item.mid .quote-range-val{color:var(--gold);}
+
+/* SHARE PANEL */
+.share-panel{background:var(--pale);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:14px;}
+.share-panel-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--navy);font-family:'DM Mono',monospace;margin-bottom:10px;}
+.share-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+@media(max-width:500px){.share-btns{grid-template-columns:1fr;}}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;align-items:center;justify-content:center;padding:14px;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--white);border-radius:14px;border:1px solid var(--border);max-width:680px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.3);}
+.modal-head{background:var(--navy);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-radius:14px 14px 0 0;position:sticky;top:0;}
+.modal-head-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;}
+.modal-close{background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:7px;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.modal-close:hover{background:rgba(255,255,255,.28);}
+.modal-body{padding:20px;}
+.guide-step{display:flex;gap:11px;margin-bottom:18px;}
+.guide-num{width:28px;height:28px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px;}
+.guide-content h3{font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:var(--navy);margin-bottom:3px;}
+.guide-content p{font-size:12px;color:var(--ink);line-height:1.6;}
+.guide-content ul{font-size:12px;color:var(--ink);line-height:1.8;padding-left:15px;margin-top:3px;}
+.guide-tip{background:var(--pale);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:8px 11px;margin-top:6px;font-size:11px;color:var(--muted);}
+.guide-divider{height:1px;background:var(--border);margin:4px 0 16px;}
+
+/* LOGO UPLOAD */
+.logo-upload-area{border:2px dashed var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .15s;}
+.logo-upload-area:hover{border-color:var(--steel);background:var(--pale);}
+.logo-preview-img{max-height:55px;max-width:170px;object-fit:contain;display:block;margin:0 auto 7px;}
+.logo-upload-text{font-size:12px;color:var(--muted);}
+
+@media print{
+  body>*:not(#preview-modal){display:none!important;}
+  .preview-modal-overlay{display:block!important;position:static!important;background:none!important;padding:0!important;}
+  .preview-modal-box{box-shadow:none!important;min-height:auto!important;}
+  .preview-modal-bar{display:none!important;}
+  .preview-modal-content{padding:0!important;}
+  body{background:#fff;}
+}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="header-icon" id="header-icon-wrap">🏗️</div>
+      <div>
+        <div class="header-title" id="header-company-name">ContractForge</div>
+        <div class="header-sub">Contract · Quote · Receipt Builder</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span class="version-badge">v2.7</span>
+      <button class="btn btn-outline" onclick="toggleDark()" id="theme-btn">🌙 Dark</button>
+      <button class="btn btn-outline" onclick="openGuide()">❓ Guide</button>
+      <button class="btn btn-outline" onclick="clearProject()">🗑 Clear</button>
+      <button class="btn btn-outline" onclick="saveProject()">💾 Save</button>
+      <button class="btn btn-outline" onclick="loadProject()">📂 Load</button>
+      <button class="btn btn-gold" onclick="printDoc()">🖨 Print</button>
+    </div>
+  </div>
+</header>
+
+<div class="mode-bar">
+  <span class="mode-label">Preview:</span>
+  <button class="mode-action-btn quote-btn" onclick="openPreviewModal('quote')">📋 Preview Quote</button>
+  <button class="mode-action-btn contract-btn" onclick="openPreviewModal('contract')">📝 Preview Contract</button>
+  <button class="mode-action-btn receipt-btn" onclick="openPreviewModal('receipt')">🧾 Preview Receipts</button>
+</div>
+
+<div class="main-wrap">
+  <aside class="sidebar">
+    <div class="sidebar-label">Navigation</div>
+    <div class="nav-item nav-wiz" onclick="navTo('sec-wizard',this)"><div class="nav-num">⚡</div> Quote Wizard</div>
+    <div class="nav-item" onclick="navTo('sec-company',this)"><div class="nav-num">★</div> Company</div>
+    <div class="nav-item" onclick="navTo('sec-matconfig',this)"><div class="nav-num">⚙</div> Materials</div>
+    <div class="nav-item" onclick="navTo('sec-project',this)"><div class="nav-num">1</div> Project</div>
+    <div class="nav-item" onclick="navTo('sec-clients',this)"><div class="nav-num">2</div> Clients</div>
+    <div class="nav-item" onclick="navTo('sec-rates',this)"><div class="nav-num">3</div> Rates</div>
+    <div class="nav-item" onclick="navTo('sec-scope',this)"><div class="nav-num">4</div> Scope</div>
+    <div class="nav-item" onclick="navTo('sec-payment',this)"><div class="nav-num">5</div> Payment</div>
+  </aside>
+
+  <main>
+
+    <!-- ⚡ QUOTE WIZARD -->
+    <div class="section-card" id="sec-wizard">
+      <div class="section-head" onclick="toggleSection('sec-wizard')">
+        <div class="section-head-num">⚡</div>
+        <div class="section-head-title">Quote Wizard — Field Interview</div>
+        <span class="section-head-badge">Mobile Ready</span>
+        <span class="section-chevron">▾</span>
+      </div>
+      <div class="wiz-wrap" id="wiz-body">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- COMPANY -->
+    <div class="section-card" id="sec-company">
+      <div class="section-head" onclick="toggleSection('sec-company')">
+        <div class="section-head-num">★</div>
+        <div class="section-head-title">Company Profile</div>
+        <span class="section-head-badge">Saved Permanently</span>
+        <span class="section-chevron">▾</span>
+      </div>
+      <div class="section-body">
+        <p class="hint" style="margin-bottom:12px;">Saved to your browser. Pre-fills every new project and appears on all printed documents.</p>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Company Name</label><input class="form-input" id="co-name" placeholder="e.g. Deck King" oninput="saveCompany();updateHeader();"></div>
+          <div class="form-group"><label class="form-label">Owner / Rep Name</label><input class="form-input" id="co-rep" placeholder="e.g. Chris McLean" oninput="saveCompany()"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Address</label><input class="form-input" id="co-address" placeholder="1020 Lakeshore Rd, Maidstone ON" oninput="saveCompany()"></div>
+          <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="co-phone" placeholder="519-555-0100" oninput="saveCompany()"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="co-email" placeholder="info@deckking.ca" oninput="saveCompany()"></div>
+          <div class="form-group"><label class="form-label">Website</label><input class="form-input" id="co-website" placeholder="www.deckking.ca" oninput="saveCompany()"></div>
+        </div>
+        <div class="section-divider"></div>
+        <div class="form-group">
+          <label class="form-label">Company Logo</label>
+          <div class="logo-upload-area" onclick="document.getElementById('logo-input').click()">
+            <img id="logo-preview" class="logo-preview-img" style="display:none">
+            <div class="logo-upload-text" id="logo-upload-text">Click or tap to upload logo (PNG, JPG, SVG)</div>
+          </div>
+          <input type="file" id="logo-input" accept="image/*" style="display:none" onchange="handleLogo(event)">
+          <button class="btn btn-red" style="margin-top:6px;font-size:11px;" onclick="removeLogo()">Remove Logo</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MATERIALS CONFIG -->
+    <div class="section-card" id="sec-matconfig">
+      <div class="section-head" onclick="toggleSection('sec-matconfig')">
+        <div class="section-head-num">⚙</div>
+        <div class="section-head-title">Materials Config</div>
+        <span class="section-head-badge">Saved Permanently</span>
+        <span class="section-chevron">▾</span>
+      </div>
+      <div class="section-body">
+        <p class="hint" style="margin-bottom:12px;">Enter your standard supplier prices. The Quote Wizard will pre-fill matching materials automatically.</p>
+        <div style="overflow-x:auto;">
+          <table class="mat-table" id="matconfig-table">
+            <thead><tr><th>Material Name</th><th>Unit</th><th>$ per Unit</th><th></th></tr></thead>
+            <tbody id="matconfig-body"></tbody>
+          </table>
+        </div>
+        <button class="btn btn-navy" style="margin-top:10px;font-size:12px;" onclick="addMatConfigItem()">+ Add Material</button>
+      </div>
+    </div>
+
+    <!-- PROJECT -->
+    <div class="section-card" id="sec-project">
+      <div class="section-head" onclick="toggleSection('sec-project')"><div class="section-head-num">1</div><div class="section-head-title">Project Information</div><span class="section-chevron">▾</span></div>
+      <div class="section-body">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Project Name</label><input class="form-input" id="proj-name" placeholder="e.g. Belmont Ave Fence" oninput="update()"></div>
+          <div class="form-group"><label class="form-label">Project Type</label>
+            <select class="form-input" id="proj-type" onchange="loadScopeDefaults();update()">
+              <option value="fence">Fence</option><option value="deck">Deck</option>
+              <option value="both">Fence &amp; Deck</option><option value="other">Other</option>
+            </select></div>
+        </div>
+        <div class="form-row single"><div class="form-group"><label class="form-label">Property Address</label><input class="form-input" id="proj-address" placeholder="4426 Belmont Ave, Comber, ON" oninput="update()"></div></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Agreement Date</label><input class="form-input" id="proj-date" type="date" oninput="update()"></div>
+          <div class="form-group"><label class="form-label">Estimated Start</label><input class="form-input" id="proj-start" type="date" oninput="update()"></div>
+        </div>
+        <div class="form-row single"><div class="form-group"><label class="form-label">Special Notes</label><textarea class="form-input" id="proj-notes" rows="3" placeholder="Any project-specific notes..." oninput="update()"></textarea></div></div>
+      </div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div class="section-card" id="sec-clients">
+      <div class="section-head" onclick="toggleSection('sec-clients')"><div class="section-head-num">2</div><div class="section-head-title">Clients</div><span class="section-chevron">▾</span></div>
+      <div class="section-body">
+        <p class="hint" style="margin-bottom:10px;">Add each client. For shared projects enter each person's dollar share.</p>
+        <div id="clients-list"></div>
+        <button class="add-item-btn" onclick="addClient()">+ Add Client</button>
+      </div>
+    </div>
+
+    <!-- RATES -->
+    <div class="section-card" id="sec-rates">
+      <div class="section-head" onclick="toggleSection('sec-rates')"><div class="section-head-num">3</div><div class="section-head-title">Standard Pricing Rates</div><span class="section-head-badge">Saved Permanently</span><span class="section-chevron">▾</span></div>
+      <div class="section-body">
+        <p class="hint" style="margin-bottom:12px;">Your default rates. Saved to your browser. Used by the Quote Wizard and auto-fill scope items.</p>
+        <div class="rate-grid">
+          <div class="rate-card"><div class="rate-card-label">Labour / Linear Ft ($)</div><input class="rate-card-input" id="rate-lf" type="number" placeholder="0.00" oninput="saveRates()"></div>
+          <div class="rate-card"><div class="rate-card-label">Materials / Linear Ft ($)</div><input class="rate-card-input" id="rate-mat-lf" type="number" placeholder="0.00" oninput="saveRates()"></div>
+          <div class="rate-card"><div class="rate-card-label">Per Gate ($)</div><input class="rate-card-input" id="rate-gate" type="number" placeholder="0.00" oninput="saveRates()"></div>
+          <div class="rate-card"><div class="rate-card-label">Post Install (each $)</div><input class="rate-card-input" id="rate-post" type="number" placeholder="0.00" oninput="saveRates()"></div>
+          <div class="rate-card"><div class="rate-card-label">Labour / Sq Ft Deck ($)</div><input class="rate-card-input" id="rate-deck-sf" type="number" placeholder="0.00" oninput="saveRates()"></div>
+          <div class="rate-card"><div class="rate-card-label">Footing / Post ($)</div><input class="rate-card-input" id="rate-footing" type="number" placeholder="0.00" oninput="saveRates()"></div>
+          <div class="rate-card"><div class="rate-card-label">Railing / Linear Ft ($)</div><input class="rate-card-input" id="rate-rail" type="number" placeholder="0.00" oninput="saveRates()"></div>
+          <div class="rate-card"><div class="rate-card-label">Stair (per step $)</div><input class="rate-card-input" id="rate-stair" type="number" placeholder="0.00" oninput="saveRates()"></div>
+          
+          <!-- NEW: Site Cleanup and Demo rates -->
+          <div class="rate-card"><div class="rate-card-label">Site Cleanup (Flat $)</div><input class="rate-card-input" id="rate-cleanup" type="number" placeholder="0.00" oninput="saveRates()"></div>
+          <div class="rate-card"><div class="rate-card-label">Demo / Tear-out ($)</div><input class="rate-card-input" id="rate-demo" type="number" placeholder="0.00" oninput="saveRates()"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCOPE -->
+    <div class="section-card" id="sec-scope">
+      <div class="section-head" onclick="toggleSection('sec-scope')"><div class="section-head-num">4</div><div class="section-head-title">Scope of Work</div><span class="section-chevron">▾</span></div>
+      <div class="section-body">
+        <p class="hint" style="margin-bottom:10px;">Check items to include. Set quantities and prices. The Quote Wizard can pre-fill this section.</p>
+        <div id="scope-list"></div>
+        <div class="section-divider"></div>
+        <div class="form-row" style="align-items:flex-end;">
+          <div class="form-group"><label class="form-label">Custom Item Name</label><input class="form-input" id="custom-item-name" placeholder="e.g. Lattice topper..."></div>
+          <div class="form-group"><label class="form-label">Unit</label>
+            <select class="form-input" id="custom-item-unit"><option>each</option><option>linear ft</option><option>sq ft</option><option>hrs</option><option>lot</option></select></div>
+          <div><button class="btn btn-navy" onclick="addCustomItem()">+ Add Custom</button></div>
+        </div>
+        <div class="section-divider"></div>
+        <div class="total-bar">
+          <div class="total-item"><div class="total-lbl">Items</div><div class="total-val" id="scope-count">0</div></div>
+          <div class="total-item"><div class="total-lbl">Subtotal</div><div class="total-val" id="scope-subtotal">$0.00</div></div>
+          <div class="total-item"><div class="total-lbl">HST (13%)</div><div class="total-val" id="scope-hst">$0.00</div></div>
+          <div class="total-item"><div class="total-lbl">Total</div><div class="total-val" id="scope-total">$0.00</div></div>
+          <div class="form-group" style="align-items:flex-end;">
+            <label class="form-label" style="color:#7A9CC8;">HST?</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:#fff;cursor:pointer;margin-top:3px;"><input type="checkbox" id="include-hst" onchange="update()"> Yes</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYMENT -->
+    <div class="section-card" id="sec-payment">
+      <div class="section-head" onclick="toggleSection('sec-payment')"><div class="section-head-num">5</div><div class="section-head-title">Payment Structure</div><span class="section-chevron">▾</span></div>
+      <div class="section-body">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Template</label>
+            <select class="form-input" id="pay-template" onchange="applyPayTemplate()">
+              <option value="custom">Custom</option>
+              <option value="5050">50/50 — Deposit + Completion</option>
+              <option value="403030">40/30/30 — Deposit / Mid / Completion</option>
+              <option value="334033">33/34/33 — Three Equal Stages</option>
+            </select></div>
+          <div class="form-group"><label class="form-label">Override Total ($)</label>
+            <input class="form-input mono" id="pay-override" type="number" placeholder="Leave blank = scope total" oninput="update()"></div>
+        </div>
+        <div id="stages-list"></div>
+        <button class="add-item-btn" onclick="addStage()">+ Add Stage</button>
+        <div class="section-divider"></div>
+        <div id="client-split-summary"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<input type="file" id="load-input" accept=".json" style="display:none" onchange="handleLoad(event)">
+
+<!-- PREVIEW MODAL -->
+<div class="preview-modal-overlay" id="preview-modal">
+  <div class="preview-modal-box">
+    <div class="preview-modal-bar">
+      <div class="preview-modal-title" id="preview-modal-title">📋 Quote Preview</div>
+      <div id="mat-display-ctrl" style="display:none;align-items:center;gap:7px;flex-wrap:wrap;">
+        <span style="font-size:10px;color:rgba(255,255,255,.6);font-family:'DM Mono',monospace;white-space:nowrap;">MATERIALS:</span>
+        <div class="mat-toggle-group">
+          <button class="mat-toggle-btn active" onclick="setMatDisplay('hidden',this)">Hidden</button>
+          <button class="mat-toggle-btn" onclick="setMatDisplay('names',this)">Names Only</button>
+          <button class="mat-toggle-btn" onclick="setMatDisplay('full',this)">Full + Costs</button>
+        </div>
+      </div>
+      <div class="preview-modal-actions">
+        <button class="btn btn-gold" onclick="printPreview()">🖨 Print / Save as PDF</button>
+        <button class="btn btn-outline" onclick="closePreviewModal()">✕ Close</button>
+      </div>
+    </div>
+    <div class="preview-modal-content" id="preview-modal-content"></div>
+  </div>
+</div>
+
+<!-- MERGE MODAL -->
+<div class="modal-overlay" id="merge-modal">
+  <div class="modal-box" style="max-width:720px;">
+    <div class="modal-head">
+      <div class="modal-head-title">🔀 Pricing Merge — Review Conflicts</div>
+      <button class="modal-close" onclick="closeMergeModal()">×</button>
+    </div>
+    <div class="modal-body" id="merge-modal-body"></div>
+  </div>
+</div>
+
+<!-- GUIDE MODAL -->
+<div class="modal-overlay" id="guide-modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-head-title">📖 How To Use ContractForge</div>
+      <button class="modal-close" onclick="closeGuide()">×</button>
+    </div>
+    <!-- Guide tab bar -->
+    <div style="display:flex;overflow-x:auto;background:var(--pale);border-bottom:2px solid var(--border);gap:0;flex-shrink:0;">
+      <button class="gtab active" onclick="showGuideTab(0)" id="gtab-0">🚀 Start</button>
+      <button class="gtab" onclick="showGuideTab(1)" id="gtab-1">🧙 Wizard</button>
+      <button class="gtab" onclick="showGuideTab(2)" id="gtab-2">💰 Prices</button>
+      <button class="gtab" onclick="showGuideTab(3)" id="gtab-3">📄 Docs</button>
+      <button class="gtab" onclick="showGuideTab(4)" id="gtab-4">💾 Files</button>
+    </div>
+    <div class="modal-body" style="padding:0;">
+
+    <!-- ── TAB 0: Quick Start ── -->
+    <div class="gtab-panel" id="gpanel-0" style="padding:16px;">
+      <p style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:14px;">Do these steps the first time you set up the app:</p>
+
+      <div class="guide-step" style="margin-bottom:14px;">
+        <div class="guide-num" style="background:var(--gold);min-width:32px;height:32px;font-size:16px;">1</div>
+        <div class="guide-content">
+          <h3>Enter your company info</h3>
+          <p>Your company name, phone number, email, and logo. This appears on every document you print. You only do this once.</p>
+          <button class="btn btn-outline" style="font-size:11px;margin-top:6px;" onclick="closeGuide();navTo('sec-company')">Open Company Settings →</button>
+        </div>
+      </div>
+
+      <div class="guide-step" style="margin-bottom:14px;">
+        <div class="guide-num" style="background:var(--gold);min-width:32px;height:32px;font-size:16px;">2</div>
+        <div class="guide-content">
+          <h3>Set your prices</h3>
+          <p><strong>Labour Rates</strong> — what you charge the client per linear foot of fence, per square foot of deck, per gate, per post, etc.</p>
+          <p style="margin-top:4px;"><strong>Materials Config</strong> — what you pay your supplier for lumber, concrete, screws, and hardware.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+            <button class="btn btn-outline" style="font-size:11px;" onclick="closeGuide();navTo('sec-rates')">Open Labour Rates →</button>
+            <button class="btn btn-outline" style="font-size:11px;" onclick="closeGuide();navTo('sec-matconfig')">Open Materials Config →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="guide-step" style="margin-bottom:14px;">
+        <div class="guide-num" style="background:var(--gold);min-width:32px;height:32px;font-size:16px;">3</div>
+        <div class="guide-content">
+          <h3>Run the wizard for a new job</h3>
+          <p>Tap the <strong>⚡ Wizard</strong> section at the top of the page. Answer the questions about the client, the fence or deck size, and the options they want. At the end, tap the quote amount you want to use, then tap <strong>✅ Use This Quote → Fill Contract</strong>.</p>
+          <button class="btn btn-outline" style="font-size:11px;margin-top:6px;" onclick="closeGuide();navTo('sec-wizard')">Open Wizard →</button>
+        </div>
+      </div>
+
+      <div class="guide-step" style="margin-bottom:14px;">
+        <div class="guide-num" style="background:var(--gold);min-width:32px;height:32px;font-size:16px;">4</div>
+        <div class="guide-content">
+          <h3>Print your quote, then your contract</h3>
+          <p>Use the buttons at the very bottom of the screen:<br>
+          → Tap <strong>Preview Quote</strong> first — the client approves it.<br>
+          → When they're ready to sign, tap <strong>Preview Contract</strong> — same info but with terms and signature lines.</p>
+        </div>
+      </div>
+
+      <div style="background:var(--pale);border-radius:8px;padding:10px 13px;font-size:11px;color:var(--muted);border-left:3px solid var(--gold);">
+        💡 Steps 1 and 2 are permanent — set them once and they're saved forever. Steps 3 and 4 are for every new job.
+      </div>
+    </div>
+
+    <!-- ── TAB 1: Wizard ── -->
+    <div class="gtab-panel" id="gpanel-1" style="display:none;padding:16px;">
+      <p style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:12px;">The wizard walks you through a job one question at a time — designed for your phone at the client's property.</p>
+
+      <div class="guide-step" style="margin-bottom:12px;">
+        <div class="guide-num" style="background:var(--steel);">📱</div>
+        <div class="guide-content">
+          <h3>How it works</h3>
+          <p>Answer each question and tap Next. The wizard remembers your answers and skips questions that don't apply. At the end it calculates the full material list and shows you three quote amounts.</p>
+        </div>
+      </div>
+
+      <div class="guide-step" style="margin-bottom:12px;">
+        <div class="guide-num" style="background:var(--steel);">💰</div>
+        <div class="guide-content">
+          <h3>Choosing Low, Standard, or With Buffer</h3>
+          <p>At the end of the wizard you'll see three amounts. <strong>Tap the one you want to use</strong> — it highlights gold. Then tap <strong>Use This Quote</strong>.</p>
+          <ul>
+            <li><strong>Conservative (−10%)</strong> — use when you're confident about pricing and want to be competitive</li>
+            <li><strong>Standard</strong> — the calculated mid-point, most common choice</li>
+            <li><strong>With Buffer (+10%)</strong> — use when the job has unknowns or you expect surprises</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="guide-step" style="margin-bottom:12px;">
+        <div class="guide-num" style="background:var(--steel);">—</div>
+        <div class="guide-content">
+          <h3>Why do the totals show dashes (—)?</h3>
+          <p>The quote range uses your labour rates. If you haven't set them yet, the totals will show — instead of dollar amounts.</p>
+          <button class="btn btn-outline" style="font-size:11px;margin-top:6px;" onclick="closeGuide();navTo('sec-rates')">Set Labour Rates →</button>
+        </div>
+      </div>
+
+      <div class="guide-step" style="margin-bottom:12px;">
+        <div class="guide-num" style="background:var(--steel);">💾</div>
+        <div class="guide-content">
+          <h3>Save Project File</h3>
+          <p>This downloads the project as a file to your device. You can email it to yourself, save it to Google Drive, or load it later on your computer to finish the contract.</p>
+        </div>
+      </div>
+
+      <div style="background:var(--pale);border-radius:8px;padding:10px 13px;font-size:11px;color:var(--muted);border-left:3px solid var(--gold);">
+        💡 You can edit any quantity in the material list before accepting — just tap the number and type a new one.
+      </div>
+    </div>
+
+    <!-- ── TAB 2: Prices ── -->
+    <div class="gtab-panel" id="gpanel-2" style="display:none;padding:16px;">
+      <p style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:12px;">There are two separate places to enter prices. Both are saved permanently to your browser.</p>
+
+      <div class="guide-step" style="margin-bottom:14px;">
+        <div class="guide-num" style="background:var(--gold);">$</div>
+        <div class="guide-content">
+          <h3>Labour Rates — what you charge clients</h3>
+          <p>These are your install prices — what you bill for the work itself:</p>
+          <ul>
+            <li><strong>Labour / Linear Ft</strong> — your fence install rate (e.g. $18/LF)</li>
+            <li><strong>Materials / Linear Ft</strong> — a materials markup rate if you bill it that way</li>
+            <li><strong>Gate install rate</strong> — per gate (e.g. $250)</li>
+            <li><strong>Post rate</strong> — per post (e.g. $45)</li>
+            <li><strong>Deck / Sq Ft</strong> — your deck install rate (e.g. $22/sqft)</li>
+            <li><strong>Footing rate</strong> — per concrete footing</li>
+            <li><strong>Railing rate</strong> — per linear foot of railing</li>
+            <li><strong>Stair rate</strong> — per flight of stairs</li>
+          </ul>
+          <button class="btn btn-outline" style="font-size:11px;margin-top:6px;" onclick="closeGuide();navTo('sec-rates')">Open Labour Rates →</button>
+        </div>
+      </div>
+
+      <div class="guide-step" style="margin-bottom:14px;">
+        <div class="guide-num" style="background:var(--steel);">🪵</div>
+        <div class="guide-content">
+          <h3>Materials Config — what you pay suppliers</h3>
+          <p>Enter the current price you pay for each material at your supplier. The wizard uses these to calculate the material cost subtotal automatically.</p>
+          <p style="margin-top:4px;">You can add custom materials, change names, or update prices any time. Prices stay saved until you change them.</p>
+          <button class="btn btn-outline" style="font-size:11px;margin-top:6px;" onclick="closeGuide();navTo('sec-matconfig')">Open Materials Config →</button>
+        </div>
+      </div>
+
+      <div style="background:var(--pale);border-radius:8px;padding:10px 13px;font-size:11px;color:var(--muted);border-left:3px solid var(--gold);">
+        💡 Fill in your Labour Rates before running the wizard so the quote range shows real dollar amounts. Fill in Materials Config so unit costs pre-fill automatically in the material list.
+      </div>
+    </div>
+
+    <!-- ── TAB 3: Documents ── -->
+    <div class="gtab-panel" id="gpanel-3" style="display:none;padding:16px;">
+      <p style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:12px;">Three documents — same buttons, fixed at the bottom of the screen no matter how far you scroll.</p>
+
+      <div class="guide-step" style="margin-bottom:14px;">
+        <div class="guide-num" style="background:var(--gold);">📋</div>
+        <div class="guide-content">
+          <h3>Preview Quote</h3>
+          <p>A professional estimate showing the scope of work and the total. Has a note at the bottom that says "this is a quote only, not a binding contract." Send or print this for client approval first.</p>
+        </div>
+      </div>
+
+      <div class="guide-step" style="margin-bottom:14px;">
+        <div class="guide-num" style="background:var(--gold);">📝</div>
+        <div class="guide-content">
+          <h3>Preview Contract</h3>
+          <p>The same as the quote, but adds Terms &amp; Conditions and signature lines for both parties. Print this when the client is ready to sign.</p>
+        </div>
+      </div>
+
+      <div class="guide-step" style="margin-bottom:14px;">
+        <div class="guide-num" style="background:var(--gold);">🧾</div>
+        <div class="guide-content">
+          <h3>Preview Receipts</h3>
+          <p>Generates one receipt block for every unpaid payment stage, for each client. Each receipt has a payment method checkbox, date line, and your signature. Mark a stage paid in the Payment Structure section and it disappears from the receipt book.</p>
+        </div>
+      </div>
+
+      <div class="guide-step" style="margin-bottom:12px;">
+        <div class="guide-num" style="background:var(--steel);">🪵</div>
+        <div class="guide-content">
+          <h3>Materials toggle (Quote &amp; Contract)</h3>
+          <p>In the preview window there's a toggle at the top with three options:</p>
+          <ul>
+            <li><strong>Hidden</strong> — client sees scope items only, no material list (recommended)</li>
+            <li><strong>Names Only</strong> — shows material names and quantities, no costs; useful when the customer is buying their own materials</li>
+            <li><strong>Full + Costs</strong> — shows everything including your unit prices</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="background:var(--pale);border-radius:8px;padding:10px 13px;font-size:11px;color:var(--muted);border-left:3px solid var(--gold);">
+        💡 Typical workflow: Print Quote for approval → client says yes → print Contract for signing → collect deposit → mark Deposit stage as paid.
+      </div>
+    </div>
+
+    <!-- ── TAB 4: Files ── -->
+    <div class="gtab-panel" id="gpanel-4" style="display:none;padding:16px;">
+      <p style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:12px;">The app saves everything to your browser automatically. Files are for backing up and moving jobs between devices.</p>
+
+      <div class="guide-step" style="margin-bottom:14px;">
+        <div class="guide-num" style="background:var(--gold);">💾</div>
+        <div class="guide-content">
+          <h3>Saving a project</h3>
+          <p>Tap <strong>Save</strong> at the top of the page. A file downloads to your device with a name like <code>Johnson-Fence.json</code>. Keep these as your records — one file per job.</p>
+        </div>
+      </div>
+
+      <div class="guide-step" style="margin-bottom:14px;">
+        <div class="guide-num" style="background:var(--gold);">📂</div>
+        <div class="guide-content">
+          <h3>Loading a project</h3>
+          <p>Tap <strong>Load</strong> at the top and pick the file. Everything reloads exactly as you left it — client info, scope, payment stages, and material list.</p>
+        </div>
+      </div>
+
+      <div class="guide-step" style="margin-bottom:14px;">
+        <div class="guide-num" style="background:var(--steel);">📱→💻</div>
+        <div class="guide-content">
+          <h3>Moving a job from phone to computer</h3>
+          <ol style="font-size:12px;line-height:2;padding-left:16px;margin-top:4px;">
+            <li>Finish the wizard on your phone</li>
+            <li>Tap <strong>💾 Save Project File</strong> at the bottom of the wizard results</li>
+            <li>Email the file to yourself, or save it to Google Drive / iCloud</li>
+            <li>Open ContractForge on your computer</li>
+            <li>Tap <strong>Load</strong> and pick the file</li>
+            <li>Finish the contract and print</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="guide-step" style="margin-bottom:12px;">
+        <div class="guide-num" style="background:var(--steel);">🔒</div>
+        <div class="guide-content">
+          <h3>Your settings are automatic</h3>
+          <p>Company info, labour rates, and material prices are saved in your browser automatically. They don't disappear when you close the app — only the project data (scope, clients, payments) needs to be saved as a file.</p>
+        </div>
+      </div>
+
+      <div style="background:var(--pale);border-radius:8px;padding:10px 13px;font-size:11px;color:var(--muted);border-left:3px solid var(--gold);">
+        💡 No data is ever sent to any server. Everything stays on your device. ContractForge works completely offline after the first load.
+      </div>
+    </div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">ContractForge is an all-in-one tool for fence and deck contractors. Build quotes in the field on your phone, then finish the contract and receipts at the office. Everything is in one HTML file — no internet required after first load.</p>
+
+      <div class="guide-step">
+        <div class="guide-num" style="background:var(--gold);">⚡</div>
+        <div class="guide-content">
+          <h3>Quote Wizard — Start Here in the Field</h3>
+          <p>A one-question-at-a-time interview optimised for phone use on the job site. Walk through fence style, height, post size, burial depth, gate details, and extras. At the end you get:</p>
+          <ul>
+            <li>A full material list with quantities (boards, posts, rails, concrete, hardware)</li>
+            <li><strong>Editable quantities</strong> — override any calculated number before accepting</li>
+            <li>Unit cost fields pre-filled from your Materials Config (if prices are entered)</li>
+            <li>A ±10% quote range based on material costs + your labour rates</li>
+            <li><strong>Use This Quote</strong> — loads everything into the scope and sets the quote total automatically from your real costs</li>
+          </ul>
+          <div class="guide-tip">💡 Fill in your Materials Config prices before running the wizard so unit costs pre-fill automatically. The wizard warns you if none are set.</div>
+          <div class="guide-tip">💡 Use <strong>Share / Export</strong> at the end to send the quote JSON to yourself. Load it on desktop to build the full contract.</div>
+        </div>
+      </div>
+      <div class="guide-divider"></div>
+
+      <div class="guide-step">
+        <div class="guide-num" style="background:var(--steel);">★</div>
+        <div class="guide-content">
+          <h3>Company Profile (Permanent)</h3>
+          <p>Enter your company name, rep name, address, phone, email, and logo once. Saves to your browser permanently and appears on every quote, contract, and receipt you print.</p>
+          <div class="guide-tip">💡 Click the section header to collapse it once you're done — all sections are collapsible to keep the page tidy.</div>
+        </div>
+      </div>
+      <div class="guide-divider"></div>
+
+      <div class="guide-step">
+        <div class="guide-num" style="background:var(--steel);">⚙</div>
+        <div class="guide-content">
+          <h3>Materials Config (Permanent)</h3>
+          <p>Store your standard supplier prices for every material type — boards, posts, rails, concrete, hardware, and more. These prices are saved permanently to your browser and used to pre-fill the Quote Wizard material list automatically.</p>
+          <ul>
+            <li>Edit any name, unit, or price directly in the table</li>
+            <li>Add custom materials with <strong>+ Add Material</strong></li>
+            <li>Prices persist across browser sessions — set once, used forever</li>
+          </ul>
+          <div class="guide-tip">💡 Fill this in before your first wizard run. The wizard will warn you if no prices are entered.</div>
+        </div>
+      </div>
+      <div class="guide-divider"></div>
+
+      <div class="guide-step">
+        <div class="guide-num" style="background:var(--steel);">▶</div>
+        <div class="guide-content">
+          <h3>Preview Bar (Fixed at Bottom)</h3>
+          <p>The <strong>Preview Quote</strong>, <strong>Preview Contract</strong>, and <strong>Preview Receipts</strong> buttons are fixed to the bottom of the screen — always accessible no matter how far you've scrolled. All three draw from the same project data.</p>
+          <ul>
+            <li><strong>Quote</strong> — itemised scope with totals, quote-only notice at bottom</li>
+            <li><strong>Contract</strong> — full terms, scope, payment schedule, and signature blocks</li>
+            <li><strong>Receipts</strong> — one receipt block per unpaid stage per client</li>
+          </ul>
+          <p style="margin-top:6px;">When previewing a Quote or Contract, a <strong>Materials:</strong> toggle appears in the modal bar with three options:</p>
+          <ul>
+            <li><strong>Hidden</strong> (default) — no material list shown, clean quote</li>
+            <li><strong>Names Only</strong> — shows material names and quantities, no costs; useful when the customer is buying their own materials</li>
+            <li><strong>Full + Costs</strong> — complete table with unit costs and line totals</li>
+          </ul>
+          <div class="guide-tip">💡 Print Quote first for approval. Switch to Contract for signing. Use Receipts to track payments stage by stage.</div>
+        </div>
+      </div>
+      <div class="guide-divider"></div>
+
+      <div class="guide-step">
+        <div class="guide-num">3</div>
+        <div class="guide-content">
+          <h3>Standard Pricing Rates (Permanent)</h3>
+          <p>Set your default labour rates — per linear foot, per gate, per post, deck square footage, footings, railings, and stairs. Saved permanently to your browser. Used by the Quote Wizard to estimate labour and by the Scope section to auto-fill prices.</p>
+          <div class="guide-tip">💡 This section starts collapsed. Click the header to expand it.</div>
+        </div>
+      </div>
+      <div class="guide-divider"></div>
+
+      <div class="guide-step">
+        <div class="guide-num">4</div>
+        <div class="guide-content">
+          <h3>Scope of Work</h3>
+          <p>Check items to include. Quantities and prices auto-fill from your rates. The Quote Wizard pre-fills the entire section for you when you tap <strong>Use This Quote</strong>. Add custom line items for anything not in the defaults.</p>
+          <div class="guide-tip">💡 The Override Total in Payment Structure lets you set the quote total directly from your costed material list — the scope items then act as informational line items in the contract.</div>
+        </div>
+      </div>
+      <div class="guide-divider"></div>
+
+      <div class="guide-step">
+        <div class="guide-num">5</div>
+        <div class="guide-content">
+          <h3>Payment Structure</h3>
+          <p>Choose a payment template (50/50, 40/30/30, etc.) or build custom stages. Mark stages paid as work progresses — only unpaid stages appear in the receipt book. Each client's proportional share is calculated automatically.</p>
+          <div class="guide-tip">💡 When you use <strong>Use This Quote</strong>, the Override Total is set automatically from your real material costs + labour rates.</div>
+        </div>
+      </div>
+      <div class="guide-divider"></div>
+
+      <div class="guide-step">
+        <div class="guide-num" style="background:var(--gold);">💾</div>
+        <div class="guide-content">
+          <h3>Save, Load &amp; Share</h3>
+          <p>Use <strong>Save</strong> to download the project as a <code>.json</code> file. Use <strong>Load</strong> to reopen it on any device. The Quote Wizard has a <strong>Share</strong> button that uses your phone's native share sheet — send to email, WhatsApp, Google Drive, iCloud, or any app.</p>
+          <ul>
+            <li>Company profile, rates, and material prices are saved to your browser — they don't need to be in every file</li>
+            <li>Project data (clients, scope, payments, wizard answers) is saved inside the JSON</li>
+            <li>Files saved before v2.2 will show a yellow banner when loaded — use <strong>Re-save</strong> to embed company info</li>
+          </ul>
+          <div class="guide-tip">💡 Name files after the client (e.g. <code>Roper-Fence.json</code>). Load on desktop to build the full contract from a field quote.</div>
+        </div>
+      </div>
+
+      <div class="guide-divider"></div>
+
+      <div class="guide-step">
+        <div class="guide-num" style="background:var(--steel);">🔀</div>
+        <div class="guide-content">
+          <h3>Pricing Across Devices</h3>
+          <p>When you save a project, your material prices and labour rates are embedded in the JSON file. When you load it on another device, the tool automatically:</p>
+          <ul>
+            <li><strong>Adds</strong> any materials not in your local config — silently</li>
+            <li><strong>Fills in</strong> any blank local prices from the file — silently</li>
+            <li><strong>Flags conflicts</strong> (both devices have a price but they differ) — shows a merge screen so you pick item by item</li>
+          </ul>
+          <p>The merge screen gives you three options: apply your selections individually, keep all yours, or use all values from the file.</p>
+          <div class="guide-tip">💡 To sync your full price list to a new device, just load any recent project file. Your prices travel with your work.</div>
+        </div>
+      </div>
+
+      <div style="margin-top:10px;padding:11px;background:var(--pale);border-radius:8px;font-size:11px;color:var(--muted);text-align:center;">
+        ContractForge v2.7 — No data is sent anywhere. Everything stays in your browser.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/cf-state.js?v=2.8"></script>
+<script src="js/cf-pricing.js?v=2.8"></script>
+<script src="js/cf-scope.js?v=2.8"></script>
+<script src="js/cf-wizard.js?v=2.8"></script>
+<script src="js/cf-preview.js?v=2.8"></script>
+<script src="js/cf-save-load.js?v=2.8"></script>
+<script src="js/cf-ui.js?v=2.8"></script>
+</body>
+</html>

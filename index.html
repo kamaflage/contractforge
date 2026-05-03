@@ -264,6 +264,12 @@ body.dark .matcfg-name-input,body.dark .matcfg-unit-input{background:var(--pale)
 .guide-content ul{font-size:12px;color:var(--ink);line-height:1.8;padding-left:15px;margin-top:3px;}
 .guide-tip{background:var(--pale);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:8px 11px;margin-top:6px;font-size:11px;color:var(--muted);}
 .guide-divider{height:1px;background:var(--border);margin:4px 0 16px;}
+.gtab{flex:1;min-width:58px;padding:10px 6px;border:none;background:transparent;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;font-family:'Source Sans 3',sans-serif;transition:all .15s;white-space:nowrap;}
+.gtab:hover{color:var(--navy);background:var(--pale);}
+.gtab.active{color:var(--navy);border-bottom-color:var(--gold);background:#fff;}
+body.dark .gtab{color:var(--muted);}
+body.dark .gtab.active{color:var(--ink);background:var(--white);}
+.gtab-panel{overflow-y:auto;max-height:calc(90vh - 130px);}
 
 /* LOGO UPLOAD */
 .logo-upload-area{border:2px dashed var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .15s;}
@@ -777,146 +783,18 @@ body.dark .matcfg-name-input,body.dark .matcfg-unit-input{background:var(--pale)
         💡 No data is ever sent to any server. Everything stays on your device. ContractForge works completely offline after the first load.
       </div>
     </div>
-      <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">ContractForge is an all-in-one tool for fence and deck contractors. Build quotes in the field on your phone, then finish the contract and receipts at the office. Everything is in one HTML file — no internet required after first load.</p>
-
-      <div class="guide-step">
-        <div class="guide-num" style="background:var(--gold);">⚡</div>
-        <div class="guide-content">
-          <h3>Quote Wizard — Start Here in the Field</h3>
-          <p>A one-question-at-a-time interview optimised for phone use on the job site. Walk through fence style, height, post size, burial depth, gate details, and extras. At the end you get:</p>
-          <ul>
-            <li>A full material list with quantities (boards, posts, rails, concrete, hardware)</li>
-            <li><strong>Editable quantities</strong> — override any calculated number before accepting</li>
-            <li>Unit cost fields pre-filled from your Materials Config (if prices are entered)</li>
-            <li>A ±10% quote range based on material costs + your labour rates</li>
-            <li><strong>Use This Quote</strong> — loads everything into the scope and sets the quote total automatically from your real costs</li>
-          </ul>
-          <div class="guide-tip">💡 Fill in your Materials Config prices before running the wizard so unit costs pre-fill automatically. The wizard warns you if none are set.</div>
-          <div class="guide-tip">💡 Use <strong>Share / Export</strong> at the end to send the quote JSON to yourself. Load it on desktop to build the full contract.</div>
-        </div>
-      </div>
-      <div class="guide-divider"></div>
-
-      <div class="guide-step">
-        <div class="guide-num" style="background:var(--steel);">★</div>
-        <div class="guide-content">
-          <h3>Company Profile (Permanent)</h3>
-          <p>Enter your company name, rep name, address, phone, email, and logo once. Saves to your browser permanently and appears on every quote, contract, and receipt you print.</p>
-          <div class="guide-tip">💡 Click the section header to collapse it once you're done — all sections are collapsible to keep the page tidy.</div>
-        </div>
-      </div>
-      <div class="guide-divider"></div>
-
-      <div class="guide-step">
-        <div class="guide-num" style="background:var(--steel);">⚙</div>
-        <div class="guide-content">
-          <h3>Materials Config (Permanent)</h3>
-          <p>Store your standard supplier prices for every material type — boards, posts, rails, concrete, hardware, and more. These prices are saved permanently to your browser and used to pre-fill the Quote Wizard material list automatically.</p>
-          <ul>
-            <li>Edit any name, unit, or price directly in the table</li>
-            <li>Add custom materials with <strong>+ Add Material</strong></li>
-            <li>Prices persist across browser sessions — set once, used forever</li>
-          </ul>
-          <div class="guide-tip">💡 Fill this in before your first wizard run. The wizard will warn you if no prices are entered.</div>
-        </div>
-      </div>
-      <div class="guide-divider"></div>
-
-      <div class="guide-step">
-        <div class="guide-num" style="background:var(--steel);">▶</div>
-        <div class="guide-content">
-          <h3>Preview Bar (Fixed at Bottom)</h3>
-          <p>The <strong>Preview Quote</strong>, <strong>Preview Contract</strong>, and <strong>Preview Receipts</strong> buttons are fixed to the bottom of the screen — always accessible no matter how far you've scrolled. All three draw from the same project data.</p>
-          <ul>
-            <li><strong>Quote</strong> — itemised scope with totals, quote-only notice at bottom</li>
-            <li><strong>Contract</strong> — full terms, scope, payment schedule, and signature blocks</li>
-            <li><strong>Receipts</strong> — one receipt block per unpaid stage per client</li>
-          </ul>
-          <p style="margin-top:6px;">When previewing a Quote or Contract, a <strong>Materials:</strong> toggle appears in the modal bar with three options:</p>
-          <ul>
-            <li><strong>Hidden</strong> (default) — no material list shown, clean quote</li>
-            <li><strong>Names Only</strong> — shows material names and quantities, no costs; useful when the customer is buying their own materials</li>
-            <li><strong>Full + Costs</strong> — complete table with unit costs and line totals</li>
-          </ul>
-          <div class="guide-tip">💡 Print Quote first for approval. Switch to Contract for signing. Use Receipts to track payments stage by stage.</div>
-        </div>
-      </div>
-      <div class="guide-divider"></div>
-
-      <div class="guide-step">
-        <div class="guide-num">3</div>
-        <div class="guide-content">
-          <h3>Standard Pricing Rates (Permanent)</h3>
-          <p>Set your default labour rates — per linear foot, per gate, per post, deck square footage, footings, railings, and stairs. Saved permanently to your browser. Used by the Quote Wizard to estimate labour and by the Scope section to auto-fill prices.</p>
-          <div class="guide-tip">💡 This section starts collapsed. Click the header to expand it.</div>
-        </div>
-      </div>
-      <div class="guide-divider"></div>
-
-      <div class="guide-step">
-        <div class="guide-num">4</div>
-        <div class="guide-content">
-          <h3>Scope of Work</h3>
-          <p>Check items to include. Quantities and prices auto-fill from your rates. The Quote Wizard pre-fills the entire section for you when you tap <strong>Use This Quote</strong>. Add custom line items for anything not in the defaults.</p>
-          <div class="guide-tip">💡 The Override Total in Payment Structure lets you set the quote total directly from your costed material list — the scope items then act as informational line items in the contract.</div>
-        </div>
-      </div>
-      <div class="guide-divider"></div>
-
-      <div class="guide-step">
-        <div class="guide-num">5</div>
-        <div class="guide-content">
-          <h3>Payment Structure</h3>
-          <p>Choose a payment template (50/50, 40/30/30, etc.) or build custom stages. Mark stages paid as work progresses — only unpaid stages appear in the receipt book. Each client's proportional share is calculated automatically.</p>
-          <div class="guide-tip">💡 When you use <strong>Use This Quote</strong>, the Override Total is set automatically from your real material costs + labour rates.</div>
-        </div>
-      </div>
-      <div class="guide-divider"></div>
-
-      <div class="guide-step">
-        <div class="guide-num" style="background:var(--gold);">💾</div>
-        <div class="guide-content">
-          <h3>Save, Load &amp; Share</h3>
-          <p>Use <strong>Save</strong> to download the project as a <code>.json</code> file. Use <strong>Load</strong> to reopen it on any device. The Quote Wizard has a <strong>Share</strong> button that uses your phone's native share sheet — send to email, WhatsApp, Google Drive, iCloud, or any app.</p>
-          <ul>
-            <li>Company profile, rates, and material prices are saved to your browser — they don't need to be in every file</li>
-            <li>Project data (clients, scope, payments, wizard answers) is saved inside the JSON</li>
-            <li>Files saved before v2.2 will show a yellow banner when loaded — use <strong>Re-save</strong> to embed company info</li>
-          </ul>
-          <div class="guide-tip">💡 Name files after the client (e.g. <code>Doe-Fence.json</code>). Load on desktop to build the full contract from a field quote.</div>
-        </div>
-      </div>
-
-      <div class="guide-divider"></div>
-
-      <div class="guide-step">
-        <div class="guide-num" style="background:var(--steel);">🔀</div>
-        <div class="guide-content">
-          <h3>Pricing Across Devices</h3>
-          <p>When you save a project, your material prices and labour rates are embedded in the JSON file. When you load it on another device, the tool automatically:</p>
-          <ul>
-            <li><strong>Adds</strong> any materials not in your local config — silently</li>
-            <li><strong>Fills in</strong> any blank local prices from the file — silently</li>
-            <li><strong>Flags conflicts</strong> (both devices have a price but they differ) — shows a merge screen so you pick item by item</li>
-          </ul>
-          <p>The merge screen gives you three options: apply your selections individually, keep all yours, or use all values from the file.</p>
-          <div class="guide-tip">💡 To sync your full price list to a new device, just load any recent project file. Your prices travel with your work.</div>
-        </div>
-      </div>
-
-      <div style="margin-top:10px;padding:11px;background:var(--pale);border-radius:8px;font-size:11px;color:var(--muted);text-align:center;">
-        ContractForge v2.7 — No data is sent anywhere. Everything stays in your browser.
-      </div>
     </div>
   </div>
 </div>
 
-<script src="js/cf-state.js?v=2.8"></script>
-<script src="js/cf-pricing.js?v=2.8"></script>
-<script src="js/cf-scope.js?v=2.8"></script>
-<script src="js/cf-wizard.js?v=2.8"></script>
-<script src="js/cf-preview.js?v=2.8"></script>
-<script src="js/cf-save-load.js?v=2.8"></script>
-<script src="js/cf-ui.js?v=2.8"></script>
+<script src="js/cf-state.js
+
+<script src="js/cf-state.js?v=2.9"></script>
+<script src="js/cf-pricing.js?v=2.9"></script>
+<script src="js/cf-scope.js?v=2.9"></script>
+<script src="js/cf-wizard.js?v=2.9"></script>
+<script src="js/cf-preview.js?v=2.9"></script>
+<script src="js/cf-save-load.js?v=2.9"></script>
+<script src="js/cf-ui.js?v=2.9"></script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 // ContractForge Service Worker
 // Bump CACHE version on every deploy to force cache refresh
-const CACHE = 'contractforge-v2.8';
+const CACHE = 'contractforge-v2.9';
 
 const ASSETS = [
   './',
@@ -8,13 +8,13 @@ const ASSETS = [
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
-  './js/cf-state.js?v=2.8',
-  './js/cf-wizard.js?v=2.8',
-  './js/cf-scope.js?v=2.8',
-  './js/cf-pricing.js?v=2.8',
-  './js/cf-preview.js?v=2.8',
-  './js/cf-save-load.js?v=2.8',
-  './js/cf-ui.js?v=2.8',
+  './js/cf-state.js?v=2.9',
+  './js/cf-wizard.js?v=2.9',
+  './js/cf-scope.js?v=2.9',
+  './js/cf-pricing.js?v=2.9',
+  './js/cf-preview.js?v=2.9',
+  './js/cf-save-load.js?v=2.9',
+  './js/cf-ui.js?v=2.9',
   'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap'
 ];
 

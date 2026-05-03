@@ -356,16 +356,16 @@ body.dark .gtab.active{color:var(--ink);background:var(--white);}
       <div class="section-body">
         <p class="hint" style="margin-bottom:12px;">Saved to your browser. Pre-fills every new project and appears on all printed documents.</p>
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Company Name</label><input class="form-input" id="co-name" placeholder="e.g. Deck King" oninput="saveCompany();updateHeader();"></div>
-          <div class="form-group"><label class="form-label">Owner / Rep Name</label><input class="form-input" id="co-rep" placeholder="e.g. John Doe" oninput="saveCompany()"></div>
+          <div class="form-group"><label class="form-label">Company Name</label><input class="form-input" id="co-name" placeholder="e.g. Maple Fence Co." oninput="saveCompany();updateHeader();"></div>
+          <div class="form-group"><label class="form-label">Owner / Rep Name</label><input class="form-input" id="co-rep" placeholder="e.g. Alex Builder" oninput="saveCompany()"></div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Address</label><input class="form-input" id="co-address" placeholder="e.g. 123 Builder Lane, Cityville ON" oninput="saveCompany()"></div>
-          <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="co-phone" placeholder="519-555-0100" oninput="saveCompany()"></div>
+          <div class="form-group"><label class="form-label">Address</label><input class="form-input" id="co-address" placeholder="e.g. 123 Builder Lane, Anytown ON" oninput="saveCompany()"></div>
+          <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="co-phone" placeholder="555-123-4567" oninput="saveCompany()"></div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="co-email" placeholder="info@deckking.ca" oninput="saveCompany()"></div>
-          <div class="form-group"><label class="form-label">Website</label><input class="form-input" id="co-website" placeholder="www.deckking.ca" oninput="saveCompany()"></div>
+          <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="co-email" placeholder="info@example.ca" oninput="saveCompany()"></div>
+          <div class="form-group"><label class="form-label">Website</label><input class="form-input" id="co-website" placeholder="www.example.ca" oninput="saveCompany()"></div>
         </div>
         <div class="section-divider"></div>
         <div class="form-group">
@@ -376,6 +376,11 @@ body.dark .gtab.active{color:var(--ink);background:var(--white);}
           </div>
           <input type="file" id="logo-input" accept="image/*" style="display:none" onchange="handleLogo(event)">
           <button class="btn btn-red" style="margin-top:6px;font-size:11px;" onclick="removeLogo()">Remove Logo</button>
+        </div>
+        <div class="section-divider"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+          <span style="font-size:11px;color:var(--muted);">Need a fresh start? This clears everything saved in your browser.</span>
+          <button class="btn btn-red" style="font-size:11px;" onclick="resetApp()">⚠️ Reset All App Data</button>
         </div>
       </div>
     </div>

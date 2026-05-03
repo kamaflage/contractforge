@@ -899,7 +899,7 @@ function wizUseQuote() {
   const rangeMultiplier = selectedQuoteRange === 'low' ? 0.9 : selectedQuoteRange === 'high' ? 1.1 : 1.0;
   if (combinedTotal > 0) document.getElementById('pay-override').value = (combinedTotal * rangeMultiplier).toFixed(2);
 
-  renderClients(); renderScope(); renderStages(); update();
+  renderClients(); renderScope(); renderStages(); update(); expandProjectSections();
   const msg = combinedTotal > 0
     ? `\nTotal set to ${fmt(combinedTotal * rangeMultiplier)}.\nAdjust in the Payment Structure section.`
     : '\nAdd supplier prices to the material list to set the total automatically.';

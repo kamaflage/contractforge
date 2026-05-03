@@ -48,12 +48,20 @@ function toggleSection(id) {
 }
 
 function initSectionStates() {
-  const defaults = {'sec-matconfig':true, 'sec-rates':true, 'sec-company':true};
+  // All sections collapsed except wizard on first load
+  const defaults = {'sec-company':true,'sec-matconfig':true,'sec-rates':true,'sec-project':true,'sec-clients':true,'sec-scope':true,'sec-payment':true};
   const stored = JSON.parse(localStorage.getItem('cf-collapsed') || '{}');
   const states = Object.assign({}, defaults, stored);
   Object.entries(states).forEach(([id, collapsed]) => {
     const card = document.getElementById(id);
     if (card && collapsed) card.classList.add('collapsed');
+  });
+}
+
+function expandProjectSections() {
+  ['sec-project','sec-clients','sec-scope','sec-payment'].forEach(id => {
+    const card = document.getElementById(id);
+    if (card) card.classList.remove('collapsed');
   });
 }
 

@@ -127,10 +127,16 @@ function handleLoad(e) {
         }
       });
       if (d.matConfig || d.labourRates) runPricingMerge(d.matConfig || [], d.labourRates || {});
-      wizRender(); renderClients(); renderScope(); renderStages(); update();
+      wizRender(); renderClients(); renderScope(); renderStages(); update(); expandProjectSections();
     } catch(err) { alert('Could not load file: ' + err.message); }
   };
   reader.readAsText(file);
+}
+
+function resetApp() {
+  if (!confirm('Reset ALL app data?\n\nThis will permanently delete:\n• Company name, address, phone, email, logo\n• All labour rates\n• All materials config prices\n• Current project\n\nThis cannot be undone.')) return;
+  Object.keys(localStorage).filter(k => k.startsWith('cf-')).forEach(k => localStorage.removeItem(k));
+  location.reload();
 }
 
 function clearProject() {

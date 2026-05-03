@@ -1,6 +1,6 @@
 // ContractForge Service Worker
 // Bump CACHE version on every deploy to force cache refresh
-const CACHE = 'contractforge-v2.9';
+const CACHE = 'contractforge-v3.0';
 
 const ASSETS = [
   './',
@@ -8,13 +8,13 @@ const ASSETS = [
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
-  './js/cf-state.js?v=2.9',
-  './js/cf-wizard.js?v=2.9',
-  './js/cf-scope.js?v=2.9',
-  './js/cf-pricing.js?v=2.9',
-  './js/cf-preview.js?v=2.9',
-  './js/cf-save-load.js?v=2.9',
-  './js/cf-ui.js?v=2.9',
+  './js/cf-state.js?v=3.0',
+  './js/cf-wizard.js?v=3.0',
+  './js/cf-scope.js?v=3.0',
+  './js/cf-pricing.js?v=3.0',
+  './js/cf-preview.js?v=3.0',
+  './js/cf-save-load.js?v=3.0',
+  './js/cf-ui.js?v=3.0',
   'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap'
 ];
 
@@ -41,27 +41,37 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch — cache-first for assets, network-first for everything else
+// Fetch — network-first for HTML (always get latest), cache-first for versioned assets
 self.addEventListener('fetch', event => {
-  // Skip non-GET requests
   if (event.request.method !== 'GET') return;
 
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      if (cached) return cached;
-      return fetch(event.request).then(response => {
-        // Cache successful responses for same-origin assets
-        if (response && response.status === 200 && response.type === 'basic') {
+  const url = new URL(event.request.url);
+  const isHTML = event.request.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname.endsWith('/');
+
+  if (isHTML) {
+    // Network-first: always try to get the latest HTML, fall back to cache offline
+    event.respondWith(
+      fetch(event.request).then(response => {
+        if (response && response.status === 200) {
           const toCache = response.clone();
           caches.open(CACHE).then(cache => cache.put(event.request, toCache));
         }
         return response;
-      }).catch(() => {
-        // Offline fallback — return cached index.html for navigation requests
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
-      });
-    })
-  );
+      }).catch(() => caches.match(event.request).then(c => c || caches.match('./index.html')))
+    );
+  } else {
+    // Cache-first: JS/CSS/fonts are versioned, serve from cache for speed
+    event.respondWith(
+      caches.match(event.request).then(cached => {
+        if (cached) return cached;
+        return fetch(event.request).then(response => {
+          if (response && response.status === 200 && response.type === 'basic') {
+            const toCache = response.clone();
+            caches.open(CACHE).then(cache => cache.put(event.request, toCache));
+          }
+          return response;
+        });
+      })
+    );
+  }
 });

@@ -89,8 +89,8 @@ function renderClients(){
     <div class="client-row">
       <div class="client-row-header"><span class="client-tag">Client ${i+1}</span>${clients.length>1?`<button class="remove-btn" onclick="removeClient(${c.id})">×</button>`:''}</div>
       <div class="client-fields">
-        <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" value="${c.name}" placeholder="e.g. Sunny Johal" onchange="clients[${i}].name=this.value;update()"></div>
-        <div class="form-group"><label class="form-label">Address</label><input class="form-input" value="${c.address}" placeholder="e.g. 4428 Belmont Ave" onchange="clients[${i}].address=this.value;update()"></div>
+        <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" value="${c.name}" placeholder="e.g. Jane Smith" onchange="clients[${i}].name=this.value;update()"></div>
+        <div class="form-group"><label class="form-label">Address</label><input class="form-input" value="${c.address}" placeholder="e.g. 456 Maple St" onchange="clients[${i}].address=this.value;update()"></div>
         <div class="form-group"><label class="form-label">Share ($)</label><input class="form-input mono" type="number" value="${c.amount}" placeholder="0.00" onchange="clients[${i}].amount=parseFloat(this.value)||0;update()"></div>
       </div>
     </div>`).join('');

@@ -33,7 +33,7 @@ function loadMatConfig() {
 }
 
 function saveMatConfig(cfg) {
-  localStorage.setItem('cf-matconfig', JSON.stringify(cfg));
+  safeSetItem('cf-matconfig', JSON.stringify(cfg));
 }
 
 function renderMatConfig() {

@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════════════════════════════
 function update() {
   const sub = getScopeSubtotal();
-  const hst = document.getElementById('include-hst').checked ? sub * 0.13 : 0;
+  const hst = document.getElementById('include-hst').checked ? Math.round(sub * HST_RATE * 100) / 100 : 0;
   const total = getProjectTotal();
   document.getElementById('scope-count').textContent = scopeItems.filter(s => s.checked).length;
   document.getElementById('scope-subtotal').textContent = fmt(sub);
@@ -16,7 +16,7 @@ function update() {
 function toggleDark() {
   const d = document.body.classList.toggle('dark');
   document.getElementById('theme-btn').textContent = d ? '☀️ Light' : '🌙 Dark';
-  localStorage.setItem('cf-dark', d ? '1' : '0');
+  safeSetItem('cf-dark', d ? '1' : '0');
 }
 
 function openGuide(tab) {
@@ -44,7 +44,7 @@ function toggleSection(id) {
   const collapsed = card.classList.toggle('collapsed');
   const states = JSON.parse(localStorage.getItem('cf-collapsed') || '{}');
   states[id] = collapsed;
-  localStorage.setItem('cf-collapsed', JSON.stringify(states));
+  safeSetItem('cf-collapsed', JSON.stringify(states));
 }
 
 function initSectionStates() {

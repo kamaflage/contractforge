@@ -65,7 +65,7 @@ function renderPreviewInto(container, m) {
   if (m !== 'receipt') {
     const checked = scopeItems.filter(s => s.checked);
     const sub = getScopeSubtotal();
-    const hst = document.getElementById('include-hst').checked ? sub * 0.13 : 0;
+    const hst = document.getElementById('include-hst').checked ? Math.round(sub * HST_RATE * 100) / 100 : 0;
     const clientList = clients.map(c => `${esc(c.name)}${c.address?' ('+esc(c.address)+')':''}`).join(' and ');
     container.innerHTML = `<div class="preview-wrap">
       <div class="pv-header">

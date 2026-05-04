@@ -71,7 +71,7 @@ function renderScope() {
 }
 
 function toggleScope(id,checked){const item=scopeItems.find(s=>s.id===id);if(item){item.checked=checked;document.getElementById('row-'+id).style.opacity=checked?1:.55;}update();}
-function updateScopeItem(id,field,val){const item=scopeItems.find(s=>s.id===id);if(item){item[field]=parseFloat(val)||0;document.getElementById('total-'+id).textContent=fmtScope(item);}update();}
+function updateScopeItem(id,field,val){const item=scopeItems.find(s=>s.id===id);if(item){item[field]=Math.max(0,parseFloat(val)||0);document.getElementById('total-'+id).textContent=fmtScope(item);}update();}
 function removeScope(id){scopeItems=scopeItems.filter(s=>s.id!==id);renderScope();update();}
 function fmtScope(item){if(!item.checked)return'';return fmt((item.qty||0)*(item.price||0));}
 
@@ -83,15 +83,16 @@ function addClient(name='',address='',amount=''){
   renderClients();update();
 }
 function removeClient(id){clients=clients.filter(c=>c.id!==id);renderClients();update();}
+function updateClient(id,field,val){const c=clients.find(c=>c.id===id);if(c){c[field]=field==='amount'?(parseFloat(val)||0):val;update();}}
 function renderClients(){
   const list=document.getElementById('clients-list');
   list.innerHTML=clients.map((c,i)=>`
     <div class="client-row">
       <div class="client-row-header"><span class="client-tag">Client ${i+1}</span>${clients.length>1?`<button class="remove-btn" onclick="removeClient(${c.id})">×</button>`:''}</div>
       <div class="client-fields">
-        <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" value="${c.name}" placeholder="e.g. Jane Smith" onchange="clients[${i}].name=this.value;update()"></div>
-        <div class="form-group"><label class="form-label">Address</label><input class="form-input" value="${c.address}" placeholder="e.g. 456 Maple St" onchange="clients[${i}].address=this.value;update()"></div>
-        <div class="form-group"><label class="form-label">Share ($)</label><input class="form-input mono" type="number" value="${c.amount}" placeholder="0.00" onchange="clients[${i}].amount=parseFloat(this.value)||0;update()"></div>
+        <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" value="${esc(c.name)}" placeholder="e.g. Jane Smith" onchange="updateClient(${c.id},'name',this.value)"></div>
+        <div class="form-group"><label class="form-label">Address</label><input class="form-input" value="${esc(c.address)}" placeholder="e.g. 456 Maple St" onchange="updateClient(${c.id},'address',this.value)"></div>
+        <div class="form-group"><label class="form-label">Share ($)</label><input class="form-input mono" type="number" value="${c.amount}" placeholder="0.00" onchange="updateClient(${c.id},'amount',this.value)"></div>
       </div>
     </div>`).join('');
 }
@@ -104,6 +105,7 @@ function addStage(name='',pct=0,paid=false){
   renderStages();update();
 }
 function removeStage(id){stages=stages.filter(s=>s.id!==id);renderStages();update();}
+function updateStage(id,field,val){const s=stages.find(s=>s.id===id);if(s){if(field==='pct')s.pct=parseFloat(val)||0;else if(field==='paid')s.paid=val;else s[field]=val;update();}}
 function applyPayTemplate(){
   const t=document.getElementById('pay-template').value;
   stages=[];
@@ -118,10 +120,10 @@ function renderStages(){
   list.innerHTML=stages.map((s,i)=>{
     const amt=total*(s.pct/100);
     return`<div class="stage-row">
-      <div class="form-group"><label class="form-label">Stage Name</label><input class="form-input" value="${esc(s.name)}" onchange="stages[${i}].name=this.value;update()"></div>
-      <div class="form-group"><label class="form-label">% of Total</label><input class="form-input mono" type="number" value="${s.pct}" min="0" max="100" onchange="stages[${i}].pct=parseFloat(this.value)||0;update()"></div>
+      <div class="form-group"><label class="form-label">Stage Name</label><input class="form-input" value="${esc(s.name)}" onchange="updateStage(${s.id},'name',this.value)"></div>
+      <div class="form-group"><label class="form-label">% of Total</label><input class="form-input mono" type="number" value="${s.pct}" min="0" max="100" onchange="updateStage(${s.id},'pct',this.value)"></div>
       <div class="form-group"><label class="form-label">Amount</label><div class="form-input mono" style="background:var(--pale);cursor:default;">${fmt(amt)}</div></div>
-      <div class="form-group" style="justify-content:flex-end;"><label class="form-label">Paid?</label><label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;margin-top:4px;"><input type="checkbox" ${s.paid?'checked':''} onchange="stages[${i}].paid=this.checked;update()"> ✓</label></div>
+      <div class="form-group" style="justify-content:flex-end;"><label class="form-label">Paid?</label><label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;margin-top:4px;"><input type="checkbox" ${s.paid?'checked':''} onchange="updateStage(${s.id},'paid',this.checked)"> ✓</label></div>
       <button class="remove-btn" onclick="removeStage(${s.id})" style="align-self:flex-end;margin-bottom:2px;">×</button>
     </div>`;
   }).join('');
@@ -131,13 +133,13 @@ function renderStages(){
 // ═══════════════════════════════════════════════════════════════
 // TOTALS
 // ═══════════════════════════════════════════════════════════════
-function getScopeSubtotal(){return scopeItems.filter(s=>s.checked).reduce((sum,s)=>sum+(s.qty||0)*(s.price||0),0);}
+function getScopeSubtotal(){return Math.round(scopeItems.filter(s=>s.checked).reduce((sum,s)=>sum+(s.qty||0)*(s.price||0),0)*100)/100;}
 function getProjectTotal(){
   const override=parseFloat(document.getElementById('pay-override').value);
   if(override>0)return override;
   const sub=getScopeSubtotal();
-  const hst=document.getElementById('include-hst').checked?sub*0.13:0;
-  return sub+hst;
+  const hst=document.getElementById('include-hst').checked?Math.round(sub*HST_RATE*100)/100:0;
+  return Math.round((sub+hst)*100)/100;
 }
 
 function renderClientSplit(){
@@ -148,7 +150,7 @@ function renderClientSplit(){
   const rows=clients.map(c=>{
     const ratio=total?(parseFloat(c.amount)||0)/total:1/clients.length;
     const rem=unpaid.reduce((s,st)=>s+total*(st.pct/100)*ratio,0);
-    return`<tr><td>${c.name||'(unnamed)'}</td><td style="text-align:right">${fmt(c.amount)}</td><td style="text-align:right">${fmt(rem)}</td></tr>`;
+    return`<tr><td>${esc(c.name)||'(unnamed)'}</td><td style="text-align:right">${fmt(c.amount)}</td><td style="text-align:right">${fmt(rem)}</td></tr>`;
   }).join('');
   el.innerHTML=`<p style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:6px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;">Per-Client Split</p>
     <table style="width:100%;border-collapse:collapse;font-size:12px;">
@@ -160,16 +162,16 @@ function renderClientSplit(){
 // ═══════════════════════════════════════════════════════════════
 // COMPANY / LOGO / RATES
 // ═══════════════════════════════════════════════════════════════
-function saveCompany(){['co-name','co-rep','co-address','co-phone','co-email','co-website'].forEach(id=>localStorage.setItem('cf-'+id,document.getElementById(id).value));update();}
+function saveCompany(){['co-name','co-rep','co-address','co-phone','co-email','co-website'].forEach(id=>safeSetItem('cf-'+id,document.getElementById(id).value));update();}
 function loadCompany(){['co-name','co-rep','co-address','co-phone','co-email','co-website'].forEach(id=>{const v=localStorage.getItem('cf-'+id);if(v)document.getElementById(id).value=v;});updateHeader();}
 function updateHeader(){const n=document.getElementById('co-name').value;document.getElementById('header-company-name').textContent=n||'ContractForge';}
-function handleLogo(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{logoData=ev.target.result;localStorage.setItem('cf-logo',logoData);showLogo(logoData);update();};reader.readAsDataURL(file);}
+function handleLogo(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{logoData=ev.target.result;safeSetItem('cf-logo',logoData);showLogo(logoData);update();};reader.onerror=()=>{alert('Could not read logo file.');};reader.readAsDataURL(file);}
 function showLogo(data){const img=document.getElementById('logo-preview');img.src=data;img.style.display='block';document.getElementById('logo-upload-text').textContent='Click to change logo';document.getElementById('header-icon-wrap').innerHTML=`<img src="${data}" class="logo-img">`;}
 function removeLogo(){logoData=null;localStorage.removeItem('cf-logo');document.getElementById('logo-preview').style.display='none';document.getElementById('logo-upload-text').textContent='Click or tap to upload logo';document.getElementById('header-icon-wrap').innerHTML='🏗️';update();}
 function loadLogoFromStorage(){const s=localStorage.getItem('cf-logo');if(s){logoData=s;showLogo(s);}}
 
 // UPDATED: Added the two new rates below
-function saveRates(){['rate-lf','rate-mat-lf','rate-gate','rate-post','rate-deck-sf','rate-footing','rate-rail','rate-stair','rate-cleanup','rate-demo'].forEach(id=>localStorage.setItem('cf-'+id,document.getElementById(id).value));}
+function saveRates(){['rate-lf','rate-mat-lf','rate-gate','rate-post','rate-deck-sf','rate-footing','rate-rail','rate-stair','rate-cleanup','rate-demo'].forEach(id=>safeSetItem('cf-'+id,document.getElementById(id).value));}
 function loadRates(){['rate-lf','rate-mat-lf','rate-gate','rate-post','rate-deck-sf','rate-footing','rate-rail','rate-stair','rate-cleanup','rate-demo'].forEach(id=>{const v=localStorage.getItem('cf-'+id);if(v)document.getElementById(id).value=v;});}
 function getRate(key){
   const map={

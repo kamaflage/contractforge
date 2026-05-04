@@ -900,10 +900,12 @@ function wizUseQuote() {
   if (combinedTotal > 0) document.getElementById('pay-override').value = (combinedTotal * rangeMultiplier).toFixed(2);
 
   renderClients(); renderScope(); renderStages(); update(); expandProjectSections();
-  const msg = combinedTotal > 0
-    ? `\nTotal set to ${fmt(combinedTotal * rangeMultiplier)}.\nAdjust in the Payment Structure section.`
-    : '\nAdd supplier prices to the material list to set the total automatically.';
-  alert('✅ Quote loaded into scope!' + msg);
+  // Show a non-blocking toast instead of alert
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#2D7D52;color:#fff;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.3);transition:opacity .4s;pointer-events:none;';
+  toast.textContent = combinedTotal > 0 ? `✅ Quote loaded! Total set to ${fmt(combinedTotal * rangeMultiplier)}` : '✅ Quote loaded into scope!';
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 400); }, 3000);
   document.getElementById('sec-project').scrollIntoView({ behavior:'smooth' });
 }
 

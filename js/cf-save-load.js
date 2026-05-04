@@ -88,7 +88,7 @@ function handleLoad(e) {
           if (d.company.logo) {
             logoData = d.company.logo;
             showLogo(logoData);
-            localStorage.setItem('cf-logo', logoData);
+            safeSetItem('cf-logo', logoData);
           } else { removeLogo(); }
           saveCompany(); updateHeader();
         }
@@ -130,6 +130,7 @@ function handleLoad(e) {
       wizRender(); renderClients(); renderScope(); renderStages(); update(); expandProjectSections();
     } catch(err) { alert('Could not load file: ' + err.message); }
   };
+  reader.onerror = () => { alert('Could not read file.'); };
   reader.readAsText(file);
 }
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ContractForge v3.0</title>
+<title>ContractForge v3.1</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -299,7 +299,7 @@ body.dark .gtab.active{color:var(--ink);background:var(--white);}
       </div>
     </div>
     <div class="header-actions">
-      <span class="version-badge">v3.0</span>
+      <span class="version-badge">v3.1</span>
       <button class="btn btn-outline" onclick="toggleDark()" id="theme-btn">🌙 Dark</button>
       <button class="btn btn-outline" onclick="openGuide()">❓ Guide</button>
       <button class="btn btn-outline" onclick="clearProject()">🗑 Clear</button>
@@ -557,6 +557,8 @@ body.dark .gtab.active{color:var(--ink);background:var(--white);}
       <button class="gtab" onclick="showGuideTab(2)" id="gtab-2">💰 Prices</button>
       <button class="gtab" onclick="showGuideTab(3)" id="gtab-3">📄 Docs</button>
       <button class="gtab" onclick="showGuideTab(4)" id="gtab-4">💾 Files</button>
+      
+      <button class="gtab" onclick="showGuideTab(5)" id="gtab-5">&#x1F3AC; Demo</button>
     </div>
     <div class="modal-body" style="padding:0;">
 
@@ -788,16 +790,27 @@ body.dark .gtab.active{color:var(--ink);background:var(--white);}
         💡 No data is ever sent to any server. Everything stays on your device. ContractForge works completely offline after the first load.
       </div>
     </div>
+    <!-- TAB 5: Demo -->
+    <div class="gtab-panel" id="gpanel-5" style="display:none;padding:16px;overflow-y:auto;max-height:calc(90vh - 140px);">
+      <p style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:12px;">Watch a quick walkthrough of ContractForge &mdash; from opening the wizard to a completed contract.</p>
+      <video controls playsinline style="width:100%;display:block;border-radius:10px;background:#000;margin-bottom:12px;">
+        <source src="contractforge_demo.mp4" type="video/mp4">
+        Your browser does not support video playback.
+      </video>
+      <div style="background:var(--pale);border-radius:8px;padding:10px 13px;font-size:11px;color:var(--muted);border-left:3px solid var(--gold);">
+        &#x1F4F1; Works on mobile &mdash; tap once to show controls, tap again to play. You can also <a href="contractforge_demo.mp4" download="ContractForge_Demo.mp4" style="color:var(--navy);font-weight:600;">download the video</a> to share with others.
+      </div>
+    </div>
     </div>
   </div>
 </div>
 
-<script src="js/cf-state.js?v=3.0"></script>
-<script src="js/cf-pricing.js?v=3.0"></script>
-<script src="js/cf-scope.js?v=3.0"></script>
-<script src="js/cf-wizard.js?v=3.0"></script>
-<script src="js/cf-preview.js?v=3.0"></script>
-<script src="js/cf-save-load.js?v=3.0"></script>
-<script src="js/cf-ui.js?v=3.0"></script>
+<script src="js/cf-state.js?v=3.1"></script>
+<script src="js/cf-pricing.js?v=3.1"></script>
+<script src="js/cf-scope.js?v=3.1"></script>
+<script src="js/cf-wizard.js?v=3.1"></script>
+<script src="js/cf-preview.js?v=3.1"></script>
+<script src="js/cf-save-load.js?v=3.1"></script>
+<script src="js/cf-ui.js?v=3.1"></script>
 </body>
 </html>
